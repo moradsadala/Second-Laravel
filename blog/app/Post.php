@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Post extends Model
 {
@@ -10,8 +11,10 @@ class Post extends Model
     // protected $primaryKey = 'post_id';          //To define your primary key
     //YOu don't need these properties if your model has single capital name from table posts=>Post
     //and the default primary key is id 
-
+    use SoftDeletes;
+    
     protected $fillable = [
         'title','content'
     ];
+    protected $dates = ['deleted_at'];
 }

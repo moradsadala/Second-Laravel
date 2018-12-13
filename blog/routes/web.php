@@ -1,5 +1,6 @@
 <?php
 use App\Post;
+use App\User;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -15,7 +16,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::resource('/post','PostController');              //To create routes for all your controller method 
+//Route::resource('/post','PostController');              //To create routes for all your controller method 
 
 Route::get('/contact','PostController@contact');
 
@@ -63,6 +64,16 @@ Route::get('/posts',function(){
         echo "Title is : " . $post->title . "<hr>" . "Content is : " . $post->content ."<hr>";
     }
     
+});
+
+Route::get('/user/{id}',function($id){
+    $user = User::find($id)->first();
+    return $user;
+});
+Route::get('/post/{id}',function($id){
+    $user = User::find($id)->first();
+    return $user;
+    //echo  $user->name . "'s post title is: " . $user->post()->title . "<hr>" . "And his content is : " . $user->post()->content ."<hr>";
 });
 
 Route::get('/find/{id}',function($id){
@@ -115,4 +126,32 @@ Route::get('/delete/{id}',function($id){
     // $post = Post::find($id);
     // $post->delete();
     Post::destroy($id);
+});
+
+Route::get('/softdelete/{id}',function($id){
+    Post::findOrFail($id)->delete();
+});
+
+Route::get('/gettrashed',function(){
+    $posts = Post::onlyTrashed()->get();
+    foreach($posts as $post){
+        echo 'The Title is: ' . $post->title . '<hr>' . 'The Content is: ' . $post->content . '<hr>';
+    }
+});
+
+Route::get('/getallposts',function(){
+    $posts = Post::withTrashed()->get();
+    foreach($posts as $post){
+        echo 'The Title is: ' . $post->title . '<hr>' 
+        . 'The Content is: ' . $post->content . '<hr>'
+        . 'Status: ' . ($post->deleted_at? 'Trashed':'Not Trashed'). '<hr>';
+    }
+});
+
+Route::get('/restore/{id}',function($id){
+    Post::withTrashed()->where('id',$id)->restore();
+});
+
+Route ::get('/forcedelete/{id}',function($id){
+    Post::withTrashed()->where('id',$id)->forceDelete();
 });
