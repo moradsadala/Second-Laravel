@@ -16,5 +16,10 @@ class Post extends Model
     protected $fillable = [
         'title','content'
     ];
-    protected $dates = ['deleted_at'];
+    protected $dates = ['deleted_at'];             //To add this property in your model
+
+    public function user(){
+        return $this->belongsTo('App\User');
+    }
+    
 }

@@ -1,6 +1,8 @@
 <?php
 use App\Post;
 use App\User;
+
+use Illuminate\Support\Facades\DB;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -67,13 +69,8 @@ Route::get('/posts',function(){
 });
 
 Route::get('/user/{id}',function($id){
-    $user = User::find($id)->first();
+    $user = User::findOrFail($id);
     return $user;
-});
-Route::get('/post/{id}',function($id){
-    $user = User::find($id)->first();
-    return $user;
-    //echo  $user->name . "'s post title is: " . $user->post()->title . "<hr>" . "And his content is : " . $user->post()->content ."<hr>";
 });
 
 Route::get('/find/{id}',function($id){
@@ -81,7 +78,7 @@ Route::get('/find/{id}',function($id){
     echo "Title is : " . $post->title . "<hr>" . "Content is : " . $post->content ."<hr>";
 });
 
-Route::get('/findOrFail/{id}',function($id){
+Route::get('/post/{id}',function($id){
     $post = Post::findOrFail($id);
     echo "Title is : " . $post->title . "<hr>" . "Content is : " . $post->content ."<hr>";
 });
@@ -154,4 +151,58 @@ Route::get('/restore/{id}',function($id){
 
 Route ::get('/forcedelete/{id}',function($id){
     Post::withTrashed()->where('id',$id)->forceDelete();
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| Eloquent Relationship
+|--------------------------------------------------------------------------
+*/
+
+//One-To-One Relationship
+
+Route::get('/user/{id}/post',function($id){
+    $user = User::findOrFail($id);
+    echo  $user->name . "'s post title is: " . $user->post->title . "<hr>" . "And his content is : " . $user->post->content ."<hr>";
+});
+
+//Inverse case 
+
+Route::get('/post/{id}/user',function($id){
+    $post = Post::findOrFail($id);
+    echo 'This post belongs to ' . $post->user->name;
+});
+
+/*-----------------------------------------------------------------*/
+
+//One-To-Many Relationship
+
+Route::get('/user/{id}/posts',function($id){
+    $user = User::findOrFail($id);
+    foreach($user->posts as $post){
+        echo $post->title . "<hr>" . $post->content . "<hr>";
+    }
+});
+
+//Many-To-Many Relationship
+
+Route::get('/user/{id}/role',function($id){
+    $user = User::findOrFail($id);
+    $roleName = DB::table('roles')
+    ->join('role_user','roles.id','role_user.role_id')
+    ->select('roles.name')
+    ->where('role_user.user_id',$id)
+    ->first();
+    echo 'The user: ' . $user->name . ' has role as: ' .  $roleName->name . PHP_EOL ;
+    ///////////////////////////////////////
+    // $i = 0 ;                          //
+    // while($i<count($user->roles)){    //
+    //     echo $user->roles[$i]->name;  //
+    //     $i++;                         //
+    // }                                 //
+    // foreach ($user->roles as $role) { //
+    //     echo $role->name;             //
+    // }                                 //
+    ///////////////////////////////////////
 });
