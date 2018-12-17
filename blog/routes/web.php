@@ -1,6 +1,8 @@
 <?php
 use App\Post;
 use App\User;
+use App\Role;
+use App\Country;
 
 use Illuminate\Support\Facades\DB;
 /*
@@ -205,4 +207,23 @@ Route::get('/user/{id}/role',function($id){
     //     echo $role->name;             //
     // }                                 //
     ///////////////////////////////////////
+
+});
+
+//Accessing Pivot Table
+Route::get('/user/{id}/rolePivot',function($id){
+    $user = User::findOrFail($id);
+    //$role_id =  $user->roles->first()->pivot->role_id;
+    // $role = Role::findOrFail($role_id);
+    // echo "the role for this user is: " . $role->name  ;
+    echo $user->roles->first()->pivot->created_at;
+});
+
+////////////////////////////////////////////
+
+Route::get('/user/country/{id}',function($id){
+    $country = Country::findOrFail($id);
+    foreach($country->posts as $post){
+        echo $post->title . "<hr>" . $post->content . "<hr>";
+    }
 });
