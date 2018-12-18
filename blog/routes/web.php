@@ -3,6 +3,7 @@ use App\Post;
 use App\User;
 use App\Role;
 use App\Country;
+use App\Photo;
 
 use Illuminate\Support\Facades\DB;
 /*
@@ -219,11 +220,31 @@ Route::get('/user/{id}/rolePivot',function($id){
     echo $user->roles->first()->pivot->created_at;
 });
 
-////////////////////////////////////////////
-
+//Through Relationship
 Route::get('/user/country/{id}',function($id){
     $country = Country::findOrFail($id);
     foreach($country->posts as $post){
         echo $post->title . "<hr>" . $post->content . "<hr>";
     }
+});
+//Polymorphic Relationship
+Route::get('/photo/user/{id}',function($id){
+    $user = User::findOrFail($id);
+    foreach ($user->photos as $photo) {
+        return $photo->path;
+    }
+});
+
+Route::get('/photo/post/{id}',function($id){
+    $post =Post::findOrFail($id);
+    foreach ($post->photos as $photo) {
+        return $photo->path;
+    }
+});
+
+//Inverse Polymorphic Relationship (get the user or the post which related to the photo)
+
+Route::get('/photoOwner/{id}',function($id){
+    $photo = Photo::findOrFail($id);
+    return $photo->imageable;
 });
