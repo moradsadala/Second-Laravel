@@ -4,6 +4,7 @@ use App\User;
 use App\Role;
 use App\Country;
 use App\Photo;
+use App\Tag;
 
 use Illuminate\Support\Facades\DB;
 /*
@@ -220,6 +221,7 @@ Route::get('/user/{id}/rolePivot',function($id){
     echo $user->roles->first()->pivot->created_at;
 });
 
+
 //Through Relationship
 Route::get('/user/country/{id}',function($id){
     $country = Country::findOrFail($id);
@@ -248,3 +250,22 @@ Route::get('/photoOwner/{id}',function($id){
     $photo = Photo::findOrFail($id);
     return $photo->imageable;
 });
+
+Route::get('/tag/post/{id}',function($id){
+    $post = Post::findOrFail($id);
+    foreach($post->tags as $tag){
+        return $tag;
+    }
+});
+ 
+
+
+Route::get('/post/tag/{id}',function($id){
+    
+    $tag = Tag::find($id);
+    foreach ($tag->posts as $post) {
+        echo $post->title;
+    }
+});
+
+
